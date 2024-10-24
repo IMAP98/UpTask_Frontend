@@ -11,8 +11,6 @@
       "@/layouts/*": ["layouts/*"],
       "@/views/*": ["views/*"],
     },
-
-
     /* Bundler mode */
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
