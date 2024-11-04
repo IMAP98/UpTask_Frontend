@@ -1,5 +1,6 @@
 import { Task } from "@/types/index";
 import { TaskCard } from "./TaskCard";
+import { statusLabels } from "@/locales/en";
 
 type TaskListProps = {
     tasks: Task[];
@@ -23,14 +24,6 @@ const statusStyles: { [key: string]: string } = {
     inProgress: "border-t-blue-500",
     underReview: "border-t-amber-500",
     completed: "border-t-emerald-500",
-};
-
-const statusLabels: { [key: string]: string } = {
-    pending: "Pending",
-    onHold: "On hold",
-    inProgress: "In progress",
-    underReview: "Under review",
-    completed: "Completed",
 };
 
 export const TaskList = ({ tasks }: TaskListProps) => {

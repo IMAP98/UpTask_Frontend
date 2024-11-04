@@ -68,6 +68,12 @@ export const TaskCard = ({ task }: TaskCardProps) => {
                                 <button
                                     type="button"
                                     className="block px-3 py-1 text-sm leading-6 text-gray-900"
+                                    onClick={() =>
+                                        navigate(
+                                            location.pathname +
+                                                `?viewTask=${task._id}`
+                                        )
+                                    }
                                 >
                                     View
                                 </button>
