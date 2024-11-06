@@ -84,7 +84,7 @@ export default function RegisterView() {
                         placeholder="Nombre"
                         className="w-full p-3  border-gray-300 border"
                         {...register("name", {
-                            required: "Thw name is required",
+                            required: "The name is required",
                         })}
                     />
                     {errors.name && (
