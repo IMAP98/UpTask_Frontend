@@ -3,53 +3,70 @@ import AddTaskModal from "@/components/tasks/AddTaskModal";
 import { EditTaskData } from "@/components/tasks/EditTaskData";
 import { TaskList } from "@/components/tasks/TaskList";
 import TaskModalDetails from "@/components/tasks/TaskModalDetails";
+import { useAuth } from "@/hooks/useAuth";
+import { isManager } from "@/utils/policies";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 
 export const ProjectDetailsView = () => {
+    const { data: user, isLoading: authLoading } = useAuth();
+
     const navigate = useNavigate();
     const params = useParams();
     const projectId = params.projectId!;
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ["project", projectId],
         queryFn: () => getProjectById(projectId),
         retry: false,
     });
 
-    if (isLoading) return <p>Loading...</p>;
-    if (!data) return <Navigate to="/404" />;
-    if (data)
+    const canEdit = useMemo(() => data?.manager === user?._id, [data, user]);
+
+    if (isLoading && authLoading) {
+        return (
+            <div className="mt-10 flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-fuchsia-500"></div>
+            </div>
+        );
+    }
+
+    if (isError) return <Navigate to="/404" />;
+
+    if (data && user) {
         return (
             <>
                 <h1 className="text-5xl font-black">{data.projectName}</h1>
                 <p className="text-2xl font-light text-gray-500 mt-5">
                     {data.description}
                 </p>
-
-                <nav className="my-5 flex gap-3">
-                    <button
-                        type="button"
-                        className="bg-purple-400 hover:bg-purple-500 px-10 py-3 text-white text-xl font-bold cursor-pointer transition-colors"
-                        onClick={() =>
-                            navigate(location.pathname + "?newTask=true")
-                        }
-                    >
-                        Add Task
-                    </button>
-                    <Link
-                        to={"team"}
-                        className="bg-fuchsia-600 hover:bg-fuchsia-700 px-10 py-3 text-white text-xl font-bold cursor-pointer transition-colors"
-                    >
-                        Members
-                    </Link>
-                </nav>
-                <TaskList tasks={data.tasks} />
+                {isManager(data.manager, user._id) && (
+                    <nav className="my-5 flex gap-3">
+                        <button
+                            type="button"
+                            className="bg-purple-400 hover:bg-purple-500 px-10 py-3 text-white text-xl font-bold cursor-pointer transition-colors"
+                            onClick={() =>
+                                navigate(location.pathname + "?newTask=true")
+                            }
+                        >
+                            Add Task
+                        </button>
+                        <Link
+                            to={"team"}
+                            className="bg-fuchsia-600 hover:bg-fuchsia-700 px-10 py-3 text-white text-xl font-bold cursor-pointer transition-colors"
+                        >
+                            Members
+                        </Link>
+                    </nav>
+                )}
+                <TaskList tasks={data.tasks} canEdit={canEdit} />
                 <AddTaskModal />
                 <EditTaskData />
                 <TaskModalDetails />
             </>
         );
+    }
 };
 
 export default ProjectDetailsView;

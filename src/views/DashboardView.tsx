@@ -1,4 +1,5 @@
 import { deleteProject, getProjects } from "@/api/ProjectAPI";
+import { useAuth } from "@/hooks/useAuth";
 import {
     Menu,
     MenuButton,
@@ -13,6 +14,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const DashboardView = () => {
+    const { data: user, isLoading: authLoading } = useAuth();
     const { data, isLoading } = useQuery({
         queryKey: ["projects"],
         queryFn: getProjects,
@@ -31,11 +33,15 @@ export const DashboardView = () => {
         },
     });
 
-    if (isLoading) {
-        return <p>Loading...</p>;
+    if (isLoading && authLoading) {
+        return (
+            <div className="mt-10 flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-fuchsia-500"></div>
+            </div>
+        );
     }
 
-    if (data)
+    if (data && user) {
         return (
             <>
                 <h1 className="text-5xl font-black">My projects</h1>
@@ -63,6 +69,17 @@ export const DashboardView = () => {
                             >
                                 <div className="flex min-w-0 gap-x-4">
                                     <div className="min-w-0 flex-auto space-y-2">
+                                        <div className="mb-2">
+                                            {project.manager === user._id ? (
+                                                <p className="font-bold text-xs uppercase bg-indigo-50 text-indigo-500 border-2 border-indigo-500 rounded-lg inline-block py-1 px-5">
+                                                    Manager
+                                                </p>
+                                            ) : (
+                                                <p className="font-bold text-xs uppercase bg-lime-50 text-lime-500 border-2 border-lime-500 rounded-lg inline-block py-1 px-5">
+                                                    Team member
+                                                </p>
+                                            )}
+                                        </div>
                                         <Link
                                             to={`/projects/${project._id}`}
                                             className="text-gray-600 cursor-pointer hover:underline text-3xl font-bold"
@@ -109,25 +126,32 @@ export const DashboardView = () => {
                                                         View
                                                     </Link>
                                                 </MenuItem>
-                                                <MenuItem>
-                                                    <Link
-                                                        to={`/projects/${project._id}/edit`}
-                                                        className="block px-3 py-1 text-sm leading-6 text-gray-900"
-                                                    >
-                                                        Edit
-                                                    </Link>
-                                                </MenuItem>
-                                                <MenuItem>
-                                                    <button
-                                                        type="button"
-                                                        className="block px-3 py-1 text-sm leading-6 text-red-500"
-                                                        onClick={() =>
-                                                            mutate(project._id)
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </MenuItem>
+                                                {project.manager ===
+                                                    user._id && (
+                                                    <>
+                                                        <MenuItem>
+                                                            <Link
+                                                                to={`/projects/${project._id}/edit`}
+                                                                className="block px-3 py-1 text-sm leading-6 text-gray-900"
+                                                            >
+                                                                Edit
+                                                            </Link>
+                                                        </MenuItem>
+                                                        <MenuItem>
+                                                            <button
+                                                                type="button"
+                                                                className="block px-3 py-1 text-sm leading-6 text-red-500"
+                                                                onClick={() =>
+                                                                    mutate(
+                                                                        project._id
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </MenuItem>
+                                                    </>
+                                                )}
                                             </MenuItems>
                                         </Transition>
                                     </Menu>
@@ -148,4 +172,5 @@ export const DashboardView = () => {
                 )}
             </>
         );
+    }
 };

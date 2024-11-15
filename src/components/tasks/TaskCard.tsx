@@ -15,9 +15,10 @@ import { toast } from "react-toastify";
 
 type TaskCardProps = {
     task: Task;
+    canEdit: boolean;
 };
 
-export const TaskCard = ({ task }: TaskCardProps) => {
+export const TaskCard = ({ task, canEdit }: TaskCardProps) => {
     const navigate = useNavigate();
     const params = useParams();
     const projectId = params.projectId!;
@@ -40,6 +41,9 @@ export const TaskCard = ({ task }: TaskCardProps) => {
                 <button
                     type="button"
                     className="text-xl font-bold text-slate-600 text-left"
+                    onClick={() =>
+                        navigate(location.pathname + `?viewTask=${task._id}`)
+                    }
                 >
                     {task.name}
                 </button>
@@ -78,32 +82,39 @@ export const TaskCard = ({ task }: TaskCardProps) => {
                                     View
                                 </button>
                             </MenuItem>
-                            <MenuItem>
-                                <button
-                                    type="button"
-                                    className="block px-3 py-1 text-sm leading-6 text-gray-900"
-                                    onClick={() =>
-                                        navigate(
-                                            location.pathname +
-                                                `?editTask=${task._id}`
-                                        )
-                                    }
-                                >
-                                    Edit
-                                </button>
-                            </MenuItem>
+                            {canEdit && (
+                                <>
+                                    <MenuItem>
+                                        <button
+                                            type="button"
+                                            className="block px-3 py-1 text-sm leading-6 text-gray-900"
+                                            onClick={() =>
+                                                navigate(
+                                                    location.pathname +
+                                                        `?editTask=${task._id}`
+                                                )
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+                                    </MenuItem>
 
-                            <MenuItem>
-                                <button
-                                    type="button"
-                                    className="block px-3 py-1 text-sm leading-6 text-red-500"
-                                    onClick={() =>
-                                        mutate({ projectId, taskId: task._id })
-                                    }
-                                >
-                                    Delete
-                                </button>
-                            </MenuItem>
+                                    <MenuItem>
+                                        <button
+                                            type="button"
+                                            className="block px-3 py-1 text-sm leading-6 text-red-500"
+                                            onClick={() =>
+                                                mutate({
+                                                    projectId,
+                                                    taskId: task._id,
+                                                })
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    </MenuItem>
+                                </>
+                            )}
                         </MenuItems>
                     </Transition>
                 </Menu>
