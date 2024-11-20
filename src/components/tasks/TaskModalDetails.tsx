@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { formatDate } from "@/utils/utils";
 import { statusLabels } from "@/locales/en";
 import { TaskStatus } from "@/types/index";
+import { NotesPanel } from "../notes/NotesPanel";
 
 export default function TaskModalDetails() {
     const params = useParams();
@@ -109,33 +110,50 @@ export default function TaskModalDetails() {
                                         >
                                             {data.name}
                                         </DialogTitle>
-                                        <p className="text-lg text-slate-500 mb-2">
-                                            Description: {data.description}
+                                        <p className="text-lg text-slate-500 mb-2 font-bold">
+                                            Description:{" "}
+                                            <span className="text-base text-slate-500 font-normal ms-1">
+                                                {data.description}
+                                            </span>
                                         </p>
-                                        <p className="text-lg text-slate-500 mb-2">
-                                            Change history:
-                                        </p>
-                                        <ul className="list-decimal list-inside">
-                                            {data.completedBy.map(
-                                                (activityLog) => (
-                                                    <li
-                                                        key={activityLog._id}
-                                                        className="text-lg text-slate-500 mb-2"
-                                                    >
-                                                        <span className="font-bold text-slaet-600">
-                                                            {
-                                                                statusLabels[
-                                                                    activityLog
-                                                                        .status
-                                                                ]
-                                                            }
-                                                            by:
-                                                        </span>{" "}
-                                                        {activityLog.user.name}
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
+
+                                        {data.completedBy.length ? (
+                                            <>
+                                                <p className="text-lg text-slate-500 mb-2 font-bold">
+                                                    Change history:
+                                                </p>
+                                                <div className="ms-3">
+                                                    <ul className="list-decimal list-inside">
+                                                        {data.completedBy.map(
+                                                            (activityLog) => (
+                                                                <li
+                                                                    key={
+                                                                        activityLog._id
+                                                                    }
+                                                                    className="text-base text-slate-500 mb-2"
+                                                                >
+                                                                    <span className="text-slaet-600">
+                                                                        {
+                                                                            statusLabels[
+                                                                                activityLog
+                                                                                    .status
+                                                                            ]
+                                                                        }
+                                                                        by:
+                                                                    </span>{" "}
+                                                                    {
+                                                                        activityLog
+                                                                            .user
+                                                                            .name
+                                                                    }
+                                                                </li>
+                                                            )
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                            </>
+                                        ) : null}
+
                                         <div className="my-5 space-y-3">
                                             <label className="font-bold">
                                                 Current state:
@@ -157,6 +175,7 @@ export default function TaskModalDetails() {
                                                 ))}
                                             </select>
                                         </div>
+                                        <NotesPanel />
                                     </DialogPanel>
                                 </TransitionChild>
                             </div>
